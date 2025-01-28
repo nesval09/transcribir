@@ -31,7 +31,7 @@ Esta aplicación web permite transcribir archivos de audio y generar resúmenes 
 
 1. Clonar el repositorio:
 ```bash
-https://github.com/nesval09/transcribir.git
+https://github.com/nesval09/transcribir_app.git
 cd transcribir
 ```
 
@@ -67,7 +67,7 @@ La aplicación estará disponible en `http://localhost:5000`
 
 2. En la consola de PythonAnywhere:
 ```bash
-git clone https://github.com/nesval09/transcribir.git
+git clone https://github.com/nesval09/transcribir_app.git
 cd transcribir
 python -m venv venv
 source venv/bin/activate
