@@ -1,0 +1,506 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}TRANCA - Transcripción y Análisis{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/marked/lib/marked.min.css">
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #0f172a;
+        min-height: 100vh;
+        color: #e2e8f0;
+    }
+    .container {
+        max-width: 1056px;
+        margin: 30px auto;
+        padding: 0 30px;
+    }
+    .main-title {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #4f46e5;
+        font-size: 3em;
+        font-weight: 600;
+    }
+    .subtitle {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
+    .brand-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #2d3748;
+    }
+    .labia-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .labia-title {
+        font-size: 2em;
+        font-weight: 600;
+        color: #4f46e5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .labia-subtitle {
+        font-size: 0.8em;
+        color: #64748b;
+        margin-left: 5px;
+    }
+    .nesval-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .nesval-brand-name {
+        font-size: 0.9em;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .copyright {
+        font-size: 0.8em;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    .section-title {
+        color: #4f46e5;
+        font-size: 1.3em;
+        font-weight: 600;
+        margin: 20px 0 10px 0;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #2d3748;
+    }
+    .upload-form {
+        background: #1e293b;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .file-input-container {
+        background: #2d3748;
+        border-radius: 8px;
+        padding: 35px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .file-input-label {
+        background: #4f46e5;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-block;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .file-input-label:hover {
+        background: #4338ca;
+        transform: translateY(-2px);
+    }
+    .file-name {
+        color: #94a3b8;
+        margin-top: 20px;
+        font-size: 0.95rem;
+    }
+    .file-info {
+        background: #2d3748;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        font-size: 1rem;
+        color: #94a3b8;
+    }
+    .btn-transcribe {
+        background: #4f46e5;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .btn-transcribe:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
+    .loading {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+        padding: 20px;
+        background: #2d3748;
+        border-radius: 8px;
+        color: #e2e8f0;
+    }
+    .transcript-box {
+        margin-top: 30px;
+        padding: 25px;
+        background: #2d3748;
+        border-radius: 8px;
+    }
+    .transcript-content {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 6px;
+        margin: 15px 0;
+        max-height: 500px;
+        overflow-y: auto;
+        line-height: 1.8;
+    }
+    .transcript-content .speaker {
+        color: #4f46e5;
+        font-weight: 600;
+        margin-top: 15px;
+        padding: 5px 0;
+    }
+    .transcript-content p {
+        margin: 5px 0;
+        padding-left: 20px;
+    }
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-action {
+        flex: 1;
+        min-width: 150px;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        color: white;
+        background: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-action:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
+    .alert {
+        background: #dc2626;
+        color: white;
+        border: none;
+        margin-top: 20px;
+    }
+    .custom-file-input {
+        display: none;
+    }
+    .result-box {
+        margin-top: 20px;
+        padding: 20px;
+        background: #1e293b;
+        border-radius: 6px;
+        display: none;
+    }
+    .result-content {
+        color: #e2e8f0;
+        line-height: 1.8;
+        white-space: pre-line;
+    }
+    .result-content h1 {
+        font-size: 1.4em;
+        margin: 15px 0 10px 0;
+    }
+    .result-content h2 {
+        font-size: 1.2em;
+        margin: 12px 0 8px 0;
+    }
+    .result-content h3 {
+        font-size: 1.1em;
+        margin: 10px 0 6px 0;
+    }
+    .result-content ul {
+        list-style-type: disc;
+        margin: 12px 0;
+        padding-left: 25px;
+    }
+    .result-content li {
+        margin: 6px 0;
+    }
+    .result-content blockquote {
+        border-left: 3px solid #4f46e5;
+        padding: 10px 20px;
+        margin: 12px 0;
+        background: #2d3748;
+        border-radius: 4px;
+    }
+    .result-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+    @media (max-width: 992px) {
+        .container {
+            margin: 15px auto;
+        }
+        .brand-container {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            align-items: center;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .btn-action {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="main-title">TRANCA 🌴</h1>
+    <h2 class="subtitle">Transcribí y analizá tu audio</h2>
+
+    <div class="brand-container">
+        <div class="labia-brand">
+            <div class="labia-title">
+                <span>LabIA</span>
+                <span>🧪</span>
+            </div>
+            <div class="labia-subtitle">Laboratorio IA</div>
+        </div>
+        <div class="nesval-brand">
+            <div class="nesval-brand-name">
+                <span>por nesval</span>
+                <span>🐧</span>
+            </div>
+            <div class="copyright">
+                <span>© 2025</span>
+                <span>👽</span>
+                <span>🇦🇷</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-form">
+        <form method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
+            <div class="file-input-container">
+                <label class="file-input-label" for="audio_file">
+                    <i class="fas fa-cloud-upload-alt"></i>&nbsp;Subir audio 🎙️
+                    <input type="file" class="custom-file-input" id="audio_file" name="audio_file"
+                           accept=".mp3,.wav,.m4a,.flac,.mp4,.aac,.mpeg" required
+                           onchange="updateFileName(this)">
+                </label>
+                <div id="file-name" class="file-name">No se ha seleccionado ningún archivo</div>
+            </div>
+
+            <div class="file-info">
+                <p><i class="fas fa-file-audio"></i>&nbsp;Formatos: MP3, WAV, M4A, FLAC, MP4, AAC, MPEG 🎵</p>
+                <p><i class="fas fa-weight-hanging"></i>&nbsp;Tamaño máximo: 100MB 📊</p>
+            </div>
+
+            <button type="submit" class="btn-transcribe">
+                <i class="fas fa-microphone"></i>&nbsp;Transcribir Audio 🎯
+            </button>
+        </form>
+
+        <div id="loading" class="loading">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only">Procesando...</span>
+            </div>
+            <p class="mt-3">Procesando el audio, esperá un poquito... ⏳</p>
+        </div>
+
+        {% if error %}
+        <div class="alert">
+            <i class="fas fa-exclamation-circle"></i>&nbsp;
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if transcript %}
+        <div class="transcript-box">
+            <h3 class="section-title">Transcripción 📝</h3>
+            <div class="transcript-content">
+                {% for line in transcript.split('\n') %}
+                    {% if line.strip() %}
+                        {% if line.startswith('Hablante') %}
+                            <div class="speaker">{{ line }} 🎤</div>
+                        {% else %}
+                            <p>{{ line }}</p>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="action-buttons">
+                <button class="btn-action" onclick="copyTranscript()">
+                    <i class="fas fa-copy"></i>Copiar texto 📋
+                </button>
+                <button class="btn-action" onclick="downloadTranscript()">
+                    <i class="fas fa-download"></i>Descargar texto 💾
+                </button>
+                <button class="btn-action" onclick="generateSummary()">
+                    <i class="fas fa-list"></i>Generar resumen 📝
+                </button>
+                <button class="btn-action" onclick="analyzeSentiment()">
+                    <i class="fas fa-heart"></i>Análisis emocional 🤩
+                </button>
+            </div>
+            <div id="summary-box" class="result-box">
+                <h3 class="section-title">Resumen 📊</h3>
+                <div class="result-content"></div>
+                <div class="result-actions">
+                    <div class="action-buttons">
+                        <button class="btn-action" onclick="downloadResult('summary')">
+                            <i class="fas fa-download"></i>Descargar resumen 📥
+                        </button>
+                        <button class="btn-action" onclick="analyzeSentiment()">
+                            <i class="fas fa-heart"></i>Análisis emocional 🤩
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="sentiment-box" class="result-box">
+                <h3 class="section-title">Análisis de Sentimiento 💚</h3>
+                <div class="result-content"></div>
+                <div class="result-actions">
+                    <button class="btn-action" onclick="downloadResult('sentiment')">
+                        <i class="fas fa-download"></i>Descargar análisis ⏬
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+}
+
+function updateFileName(input) {
+    const fileName = input.files[0]?.name || 'No se ha seleccionado ningún archivo';
+    document.getElementById('file-name').textContent = fileName;
+
+    // Limpiar resultados anteriores
+    const transcriptBox = document.querySelector('.transcript-box');
+    const resultBoxes = document.querySelectorAll('.result-box');
+
+    if (transcriptBox) transcriptBox.style.display = 'none';
+    resultBoxes.forEach(box => box.style.display = 'none');
+}
+
+function copyTranscript() {
+    const text = Array.from(document.querySelectorAll('.transcript-content .speaker, .transcript-content p'))
+        .map(el => el.textContent)
+        .join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Texto copiado al portapapeles ✅');
+    });
+}
+
+function getTranscriptText() {
+    return Array.from(document.querySelectorAll('.transcript-content .speaker, .transcript-content p'))
+        .map(el => el.textContent)
+        .join('\n');
+}
+
+function downloadText(text, filename) {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+function downloadTranscript() {
+    const text = getTranscriptText();
+    downloadText(text, 'transcripcion.txt');
+}
+
+function generateSummary() {
+    const text = getTranscriptText();
+    const summaryBox = document.getElementById('summary-box');
+    
+    summaryBox.style.display = 'block';
+    summaryBox.querySelector('.result-content').innerHTML = 'Generando resumen... ⏳';
+
+    fetch('/generate_summary', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        summaryBox.querySelector('.result-content').innerHTML = marked.parse(data.summary);
+    })
+    .catch(error => {
+        summaryBox.querySelector('.result-content').innerHTML = `Error: ${error.message} ❌`;
+    });
+}
+
+function analyzeSentiment() {
+    const text = getTranscriptText();
+    const sentimentBox = document.getElementById('sentiment-box');
+    
+    sentimentBox.style.display = 'block';
+    sentimentBox.querySelector('.result-content').innerHTML = 'Analizando sentimientos... ⏳';
+
+    fetch('/generate_sentiment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        sentimentBox.querySelector('.result-content').innerHTML = marked.parse(data.sentiment);
+    })
+    .catch(error => {
+        sentimentBox.querySelector('.result-content').innerHTML = `Error: ${error.message} ❌`;
+    });
+}
+
+function downloadResult(type) {
+    const content = document.querySelector(`#${type}-box .result-content`).textContent;
+    downloadText(content, `${type}.txt`);
+}
+</script>
+{% endblock %}
